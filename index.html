@@ -576,11 +576,11 @@
 
             // Generate appropriate amount of data
             const daysMap = {
-                '1d': 1,
-                '1w': 7,
-                '1m': 30,
-                '1y': 365,
-                'all': 730  // 2 years
+                '1d': 24,  // 24 hourly data points for 1 day
+                '1w': 7,   // 7 daily data points for 1 week
+                '1m': 30,  // 30 daily data points for 1 month
+                '1y': 52,  // 52 weekly data points for 1 year
+                'all': 365 // 365 daily data points for lifetime
             };
 
             const days = daysMap[period];
