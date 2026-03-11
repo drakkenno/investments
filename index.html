@@ -477,43 +477,86 @@
         }
 
         // Generate historical data based on stored data or mock
-        function getHistoricalData(days) {
-            // If we have stored history, use it
-            if (priceHistory.length > 0) {
-                const now = new Date();
-                const startDate = new Date(now);
-                startDate.setDate(startDate.getDate() - days);
-                
+        function getHistoricalData(period) {
+            // Define time ranges for each period
+            const now = new Date();
+            let startDate = new Date(now);
+            let dataPoints = 24;
+            
+            switch(period) {
+                case '1d':
+                    dataPoints = 24;
+                    startDate.setHours(startDate.getHours() - 24);
+                    break;
+                case '1w':
+                    dataPoints = 7;
+                    startDate.setDate(startDate.getDate() - 7);
+                    break;
+                case '1m':
+                    dataPoints = 30;
+                    startDate.setDate(startDate.getDate() - 30);
+                    break;
+                case '1y':
+                    dataPoints = 52;
+                    startDate.setFullYear(startDate.getFullYear() - 1);
+                    break;
+                case 'all':
+                    dataPoints = 365;
+                    startDate.setFullYear(startDate.getFullYear() - 2);
+                    break;
+            }
+            
+            // Try to use stored history
+            if (priceHistory.length > 1) {
                 const filtered = priceHistory.filter(item => 
                     new Date(item.fullDate) >= startDate
                 );
                 
-                if (filtered.length > 0) {
+                if (filtered.length > 2) {
                     return filtered;
                 }
             }
             
             // Fall back to mock data
-            return generateMockData(days);
+            return generateMockData(dataPoints);
         }
 
         // Generate mock data for demonstration (fallback when no history)
-        function generateMockData(days) {
+        function generateMockData(dataPoints) {
             const data = [];
             const basePrice = 2050;
             let currentPrice = basePrice;
             const now = new Date();
 
-            for (let i = days - 1; i >= 0; i--) {
+            for (let i = dataPoints - 1; i >= 0; i--) {
                 const date = new Date(now);
-                date.setDate(date.getDate() - i);
+                let dateStr;
+                
+                // Determine how to format based on data points count
+                if (dataPoints === 24) {
+                    // Hourly data for 1 day
+                    date.setHours(date.getHours() - i);
+                    dateStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                } else if (dataPoints === 7) {
+                    // Daily data for 1 week
+                    date.setDate(date.getDate() - i);
+                    dateStr = date.toLocaleDateString('en-US', { weekday: 'short' });
+                } else if (dataPoints === 52) {
+                    // Weekly data for 1 year
+                    date.setDate(date.getDate() - (i * 7));
+                    dateStr = 'W' + (Math.floor((dataPoints - i) * 52 / 365)).toString().padStart(2, '0');
+                } else {
+                    // Daily data for month and lifetime
+                    date.setDate(date.getDate() - i);
+                    dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                }
                 
                 // Add some random variation
                 currentPrice += (Math.random() - 0.5) * 20;
                 currentPrice = Math.max(1800, Math.min(2500, currentPrice)); // Keep within realistic ranges
                 
                 data.push({
-                    date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    date: dateStr,
                     fullDate: date.toISOString(),
                     price: Math.round(currentPrice * 100) / 100
                 });
@@ -574,17 +617,8 @@
             });
             document.querySelector(`[data-period="${period}"]`).classList.add('active');
 
-            // Generate appropriate amount of data
-            const daysMap = {
-                '1d': 24,  // 24 hourly data points for 1 day
-                '1w': 7,   // 7 daily data points for 1 week
-                '1m': 30,  // 30 daily data points for 1 month
-                '1y': 52,  // 52 weekly data points for 1 year
-                'all': 365 // 365 daily data points for lifetime
-            };
-
-            const days = daysMap[period];
-            const data = getHistoricalData(days);
+            // Get data for the selected period
+            const data = getHistoricalData(period);
 
             // Update current price
             updateCurrentPrice(data);
