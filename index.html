@@ -378,7 +378,10 @@
 
         <footer>
             <p>Last updated: <span id="lastUpdate">Loading...</span></p>
-            <p>Data sources: Metals API (Free tier) | © 2026 Gold Dashboard</p>
+            <p>Data source: <span id="dataSource">Initializing...</span> | © 2026 Gold Dashboard</p>
+            <p style="font-size: 0.8em; margin-top: 10px; color: #808080;">
+                💡 Tip: Gold prices are fetched in real-time when available. Open browser console (F12) to check API status.
+            </p>
         </footer>
     </div>
 
@@ -386,10 +389,13 @@
         let chart = null;
         let currentCurrency = 'USD';
         let priceHistory = [];
-        let lastFetchTime = 0;
+        let isRealData = false;  // Track if we have real API data
+        const API_BASE_URL = 'https://api.gold-api.com';
+        const HISTORY_STORAGE_KEY = 'goldPriceHistory';
+        const PRICE_CACHE_KEY = 'goldPriceCacheXAU';
+        const CACHE_TTL_MS = 60 * 1000;
         
-        // Free metal prices API - No key required!
-        // Uses metals.live API with fallback support
+        // Free price API - no key required for symbols and XAU spot price
         const currencySymbols = {
             'USD': '$',
             'EUR': '€',
@@ -402,11 +408,46 @@
             'GBP': 0.79
         };
 
+        function getCachedPrice() {
+            const cached = localStorage.getItem(PRICE_CACHE_KEY);
+            if (!cached) return null;
+
+            try {
+                const parsed = JSON.parse(cached);
+                if (!parsed || typeof parsed.price !== 'number' || typeof parsed.fetchedAt !== 'number') {
+                    return null;
+                }
+
+                if (Date.now() - parsed.fetchedAt > CACHE_TTL_MS) {
+                    return null;
+                }
+
+                return parsed;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function setCachedPrice(price, updatedAt, updatedAtReadable) {
+            localStorage.setItem(PRICE_CACHE_KEY, JSON.stringify({
+                price,
+                updatedAt,
+                updatedAtReadable,
+                fetchedAt: Date.now()
+            }));
+        }
+
         // Load price history from localStorage
         function loadPriceHistory() {
-            const stored = localStorage.getItem('goldPriceHistory');
+            const stored = localStorage.getItem(HISTORY_STORAGE_KEY);
             if (stored) {
-                priceHistory = JSON.parse(stored);
+                try {
+                    priceHistory = JSON.parse(stored).filter(item =>
+                        item && typeof item.price === 'number' && item.fullDate
+                    );
+                } catch (error) {
+                    priceHistory = [];
+                }
             }
         }
 
@@ -420,53 +461,65 @@
                 new Date(item.fullDate) > twoYearsAgo
             );
             
-            localStorage.setItem('goldPriceHistory', JSON.stringify(priceHistory));
+            localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(priceHistory));
         }
 
-        // Fetch real gold prices from multiple free APIs
+        // Fetch real gold prices from gold-api.com
         async function fetchRealGoldPrice() {
-            try {
-                // Try primary API: metals.live
-                let response = await fetch('https://api.metals.live/v1/spot/gold');
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data && data.price) {
-                        const pricePerOz = data.price;
-                        addToHistory(pricePerOz);
-                        return pricePerOz;
-                    }
-                }
-            } catch (error) {
-                console.warn('Primary API failed:', error.message);
+            const cached = getCachedPrice();
+            if (cached) {
+                isRealData = true;
+                document.getElementById('dataSource').textContent = '✓ Real-time api.gold-api.com (cached 1 min)';
+                document.getElementById('dataSource').style.color = '#4ade80';
+                addToHistory(cached.price, cached.updatedAt);
+                return cached.price;
             }
 
             try {
-                // Fallback: Try exchangerate-api for gold in USD (using a workaround)
-                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data && data.rates) {
-                        // If we get here, API is working - use mock with real base
-                        const mockPrice = 2000 + Math.random() * 100;
-                        addToHistory(mockPrice);
-                        return mockPrice;
-                    }
+                const response = await fetch(`${API_BASE_URL}/price/XAU`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const data = await response.json();
+                
+                console.log('Gold API Response:', data);
+                
+                if (data && typeof data.price === 'number') {
+                    const pricePerOz = data.price;
+
+                    console.log('✓ Got REAL price from api.gold-api.com:', pricePerOz);
+                    isRealData = true;
+                    document.getElementById('dataSource').textContent = '✓ Real-time api.gold-api.com';
+                    document.getElementById('dataSource').style.color = '#4ade80';
+                    setCachedPrice(pricePerOz, data.updatedAt, data.updatedAtReadable);
+                    addToHistory(pricePerOz, data.updatedAt);
+                    return pricePerOz;
                 }
             } catch (error) {
-                console.warn('Fallback API failed:', error.message);
+                console.warn('✗ api.gold-api.com failed:', error);
             }
+
+            if (priceHistory.length > 0) {
+                const fallbackPrice = priceHistory[priceHistory.length - 1].price;
+                document.getElementById('dataSource').textContent = '⚠ Offline: showing last saved real price';
+                document.getElementById('dataSource').style.color = '#f59e0b';
+                return fallbackPrice;
+            }
+
+            document.getElementById('dataSource').textContent = '❌ No price data available yet';
+            document.getElementById('dataSource').style.color = '#f87171';
 
             return null;
         }
 
         // Helper function to add price to history
-        function addToHistory(pricePerOz) {
-            const now = new Date();
+        function addToHistory(pricePerOz, sourceTimestamp = null) {
+            const now = sourceTimestamp ? new Date(sourceTimestamp) : new Date();
             const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
             
-            // Only add if more than 1 hour has passed since last entry
+            // Keep one snapshot per minute max to avoid storage bloat and duplicate rows
             const lastEntry = priceHistory[priceHistory.length - 1];
-            if (!lastEntry || (now - new Date(lastEntry.fullDate)) > 60 * 60 * 1000) {
+            if (!lastEntry || Math.abs(now - new Date(lastEntry.fullDate)) > 60 * 1000) {
                 priceHistory.push({
                     date: dateStr,
                     fullDate: now.toISOString(),
@@ -478,91 +531,41 @@
 
         // Generate historical data based on stored data or mock
         function getHistoricalData(period) {
-            // Define time ranges for each period
             const now = new Date();
             let startDate = new Date(now);
-            let dataPoints = 24;
             
             switch(period) {
                 case '1d':
-                    dataPoints = 24;
                     startDate.setHours(startDate.getHours() - 24);
                     break;
                 case '1w':
-                    dataPoints = 7;
                     startDate.setDate(startDate.getDate() - 7);
                     break;
                 case '1m':
-                    dataPoints = 30;
                     startDate.setDate(startDate.getDate() - 30);
                     break;
                 case '1y':
-                    dataPoints = 52;
                     startDate.setFullYear(startDate.getFullYear() - 1);
                     break;
                 case 'all':
-                    dataPoints = 365;
                     startDate.setFullYear(startDate.getFullYear() - 2);
                     break;
             }
-            
-            // Try to use stored history
-            if (priceHistory.length > 1) {
-                const filtered = priceHistory.filter(item => 
-                    new Date(item.fullDate) >= startDate
-                );
-                
-                if (filtered.length > 2) {
-                    return filtered;
-                }
-            }
-            
-            // Fall back to mock data
-            return generateMockData(dataPoints);
-        }
 
-        // Generate mock data for demonstration (fallback when no history)
-        function generateMockData(dataPoints) {
-            const data = [];
-            const basePrice = 2050;
-            let currentPrice = basePrice;
-            const now = new Date();
+            const filtered = priceHistory
+                .filter(item => new Date(item.fullDate) >= startDate)
+                .sort((a, b) => new Date(a.fullDate) - new Date(b.fullDate));
 
-            for (let i = dataPoints - 1; i >= 0; i--) {
-                const date = new Date(now);
-                let dateStr;
-                
-                // Determine how to format based on data points count
-                if (dataPoints === 24) {
-                    // Hourly data for 1 day
-                    date.setHours(date.getHours() - i);
-                    dateStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                } else if (dataPoints === 7) {
-                    // Daily data for 1 week
-                    date.setDate(date.getDate() - i);
-                    dateStr = date.toLocaleDateString('en-US', { weekday: 'short' });
-                } else if (dataPoints === 52) {
-                    // Weekly data for 1 year
-                    date.setDate(date.getDate() - (i * 7));
-                    dateStr = 'W' + (Math.floor((dataPoints - i) * 52 / 365)).toString().padStart(2, '0');
-                } else {
-                    // Daily data for month and lifetime
-                    date.setDate(date.getDate() - i);
-                    dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                }
-                
-                // Add some random variation
-                currentPrice += (Math.random() - 0.5) * 20;
-                currentPrice = Math.max(1800, Math.min(2500, currentPrice)); // Keep within realistic ranges
-                
-                data.push({
-                    date: dateStr,
-                    fullDate: date.toISOString(),
-                    price: Math.round(currentPrice * 100) / 100
-                });
+            if (filtered.length > 0) {
+                return filtered;
             }
 
-            return data;
+            const latest = priceHistory[priceHistory.length - 1];
+            if (latest) {
+                return [latest];
+            }
+
+            return [];
         }
 
         // Convert price based on selected currency
@@ -581,9 +584,9 @@
             if (data.length === 0) return;
 
             const latest = data[data.length - 1];
-            const previous = data[0];
+            const previous = data.length > 1 ? data[0] : latest;
             const change = latest.price - previous.price;
-            const changePercent = (change / previous.price) * 100;
+            const changePercent = previous.price ? (change / previous.price) * 100 : 0;
 
             const convertedPrice = convertPrice(latest.price, currentCurrency);
             const convertedChange = convertPrice(change, currentCurrency);
@@ -718,10 +721,20 @@
             // Load stored price history
             loadPriceHistory();
             
-            // Fetch real price from API (no key required!)
+            // Show loading status
+            document.getElementById('dataSource').textContent = '⏳ Loading...';
+            
+            // Fetch real price from API
+            console.log('Fetching current gold price...');
             const realPrice = await fetchRealGoldPrice();
-            if (!realPrice) {
-                console.log('Using historical data and demo pricing');
+            if (realPrice) {
+                console.log('✓ Successfully fetched real price:', realPrice);
+            } else {
+                console.log('Using historical data - real price fetch unavailable');
+                if (!isRealData) {
+                    document.getElementById('dataSource').textContent = '📊 Demo data';
+                    document.getElementById('dataSource').style.color = '#f59e0b';
+                }
             }
             
             loadChart('1d');
@@ -729,6 +742,7 @@
 
         // Auto-refresh price every 5 minutes
         setInterval(async function() {
+            console.log('Auto-refreshing gold price...');
             const realPrice = await fetchRealGoldPrice();
             const activePeriod = document.querySelector('.time-btn.active').getAttribute('data-period');
             loadChart(activePeriod);

@@ -59,22 +59,22 @@ A responsive, real-time gold price dashboard with historical price tracking and 
 
 ## Real-Time Data Integration
 
-The dashboard is integrated with **metals.live API** for real, live gold prices - **completely free, no API key required!**
+The dashboard is integrated with **api.gold-api.com** for real, live gold prices - **completely free, no API key required!**
 
 ### How It Works
 
-1. **Current Price**: Fetched in real-time from metals.live API when you load the page
-2. **Price History**: Automatically stored in your browser's localStorage, accumulating over time
-3. **Fallback**: If the API is unavailable, the dashboard uses accumulated historical data and realistic mock data
+1. **Current Price**: Fetched in real-time from `https://api.gold-api.com/price/XAU`
+2. **Price History**: Built from real snapshots saved in your browser's localStorage, accumulating over time
+3. **Fallback**: If the API is unavailable, the dashboard uses the last saved real price from local history
 4. **Auto-Refresh**: Prices update every 5 minutes automatically
 
-### metals.live API
+### gold-api.com API
 
-- **Website**: [metals.live](https://metals.live)
+- **Website**: [api.gold-api.com](https://api.gold-api.com)
 - **Cost**: Completely Free
 - **No API Key**: Required! Just works out of the box
 - **Rate Limits**: Generous free tier - perfect for client-side use
-- **What You Get**: Real-time precious metal prices
+- **What You Get**: Real-time gold prices in USD and other assets via symbols
 
 ### Local Storage
 
@@ -136,7 +136,7 @@ Near the bottom of the script:
 
 ## API Notes
 
-- **Current Data**: Using mock data generator
+- **Current Data**: Using `GET https://api.gold-api.com/price/XAU`
 - **Chart.js**: Loaded from CDN (cdn.jsdelivr.net)
 - **No Backend Required**: Fully static site - perfect for GitHub Pages
 - **CORS Friendly**: When using real APIs, ensure they support CORS or use a CORS proxy
@@ -161,4 +161,4 @@ For issues or suggestions, please create a GitHub issue in the repository.
 
 ---
 
-**✨ No Setup Required!** This dashboard works immediately out of the box. Real gold prices are fetched from [metals.live](https://metals.live) - completely free, no API key needed. Just push to GitHub Pages and you're live!
+**✨ No Setup Required!** This dashboard works immediately out of the box. Real gold prices are fetched from [api.gold-api.com](https://api.gold-api.com) - completely free, no API key needed. Just push to GitHub Pages and you're live!
