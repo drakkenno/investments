@@ -158,54 +158,17 @@
     </div>
 
     <script>
-        // Resolve API endpoint safely for localhost, LAN access, and file:// fallback.
-        const host = window.location.hostname || 'localhost';
-        const API = `http://${host}:5000`;
+        // Embedded data updated hourly by backend
         const chartLabels = ["Mar 12"];
         const chartPrices = [4492.8];
         let currentChart = null;
         let currentPeriod = '1d';
 
-        async function fetchPrice() {
-            try {
-                const res = await fetch(`${API}/api/price`);
-                const data = await res.json();
-                
-                if (data && data.prices && data.prices.eur) {
-                    document.getElementById('price').textContent = `€${data.prices.eur.toFixed(2)}`;
-                    const dt = new Date(data.timestamp);
-                    document.getElementById('time').textContent = dt.toLocaleString();
-                    document.getElementById('status').textContent = '✓ Live';
-                    document.getElementById('status').className = 'status live';
-                }
-            } catch (e) {
-                document.getElementById('status').textContent = '⚠ Offline';
-                document.getElementById('status').className = 'status';
-                console.error('Price error:', e);
-            }
-        }
-
         async function loadChart(period) {
             try {
-                let labels, prices;
-                
-                // Use embedded chart data if available (GitHub Pages), otherwise fetch from API
-                if (typeof chartLabels !== 'undefined' && typeof chartPrices !== 'undefined') {
-                    labels = chartLabels;
-                    prices = chartPrices;
-                } else {
-                    // Fallback to API fetch for localhost development
-                    const res = await fetch(`${API}/api/history/${period}`);
-                    const data = await res.json();
-                    
-                    if (!data.data || !Array.isArray(data.data)) {
-                        document.getElementById('status').textContent = 'No data yet';
-                        return;
-                    }
-                    
-                    labels = data.data.map(d => d.date);
-                    prices = data.data.map(d => d.price_eur);
-                }
+                // Use only embedded chart data (backend updates this every hour)
+                const labels = chartLabels;
+                const prices = chartPrices;
                 
                 if (prices.length === 0) {
                     document.getElementById('status').textContent = '📊 Accumulating daily data';
@@ -291,9 +254,10 @@
 
         // Initialize
         window.addEventListener('load', () => {
-            fetchPrice();
+            // Load embedded chart data (updated hourly by backend)
             loadChart('1d');
-            setInterval(fetchPrice, 5 * 60 * 1000);
+            // Update button states
+            document.querySelector('[data-period="1d"]').classList.add('active');
         });
     </script>
 </body>
