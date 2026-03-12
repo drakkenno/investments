@@ -126,17 +126,60 @@
         .status.live {
             color: #4ade80;
         }
+
+        .comparison {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+
+        .prev-price {
+            color: #888;
+        }
+
+        .price-change {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .price-change.increase {
+            color: #ffffff;
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid rgba(74, 222, 128, 0.4);
+        }
+
+        .price-change.increase .arrow {
+            color: #4ade80;
+        }
+
+        .price-change.decrease {
+            color: #ffffff;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .price-change.decrease .arrow {
+            color: #ef4444;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>💰 Gold Price</h1>
-        <p class="subtitle">Daily EUR prices from bullionbypost.eu</p>
+        <p class="subtitle">Daily gold prices that updates hourly</p>
 
         <div class="price-card">
             <div class="price-label">Current Price</div>
-            <div class="price-value" id="price">€4487.01</div>
-            <div class="price-time" id="time">2026-03-12 13:08:34</div>
+            <div class="price-value" id="price">€4490.90</div>
+            <div class="price-time" id="time">2026-03-12 13:12:44</div>
+            <div class="comparison" id="comparison"></div>
         </div>
 
         <div class="chart-card">
@@ -160,9 +203,35 @@
     <script>
         // Embedded data updated hourly by backend
         const chartLabels = ["Mar 12"];
-        const chartPrices = [4487.01];
+        const chartPrices = [4490.9];
         let currentChart = null;
         let currentPeriod = '1d';
+
+        function updateComparison() {
+            const comparisonDiv = document.getElementById('comparison');
+            if (chartPrices.length < 2) {
+                comparisonDiv.innerHTML = '';
+                return;
+            }
+
+            const currentPrice = chartPrices[chartPrices.length - 1];
+            const previousPrice = chartPrices[chartPrices.length - 2];
+            const change = currentPrice - previousPrice;
+            const percentChange = (change / previousPrice) * 100;
+            const isIncrease = change >= 0;
+
+            const changeClass = isIncrease ? 'increase' : 'decrease';
+            const arrow = isIncrease ? '↑' : '↓';
+            const sign = isIncrease ? '+' : '';
+
+            comparisonDiv.innerHTML = `
+                <div class="prev-price">Previous: €${previousPrice.toFixed(2)}</div>
+                <div class="price-change ${changeClass}">
+                    <span class="arrow">${arrow}</span>
+                    <span>${sign}${percentChange.toFixed(2)}%</span>
+                </div>
+            `;
+        }
 
         async function loadChart(period) {
             try {
@@ -256,6 +325,7 @@
         window.addEventListener('load', () => {
             // Load embedded chart data (updated hourly by backend)
             loadChart('1d');
+            updateComparison();
             // Update button states
             document.querySelector('[data-period="1d"]').classList.add('active');
         });
