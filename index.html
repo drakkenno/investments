@@ -135,8 +135,8 @@
 
         <div class="price-card">
             <div class="price-label">Current Price</div>
-            <div class="price-value" id="price">€4494.23</div>
-            <div class="price-time" id="time">2026-03-12 12:56:29</div>
+            <div class="price-value" id="price">€4491.07</div>
+            <div class="price-time" id="time">2026-03-12 13:01:38</div>
         </div>
 
         <div class="chart-card">
@@ -161,6 +161,12 @@
         // Resolve API endpoint safely for localhost, LAN access, and file:// fallback.
         const host = window.location.hostname || 'localhost';
         const API = `http://${host}:5000`;
+        const chartLabels = ["Mar 12"];
+        const chartPrices = [4491.07];
+        const chartLabels = ["Mar 12"];
+        const chartPrices = [4491.07];
+        const chartLabels = ["Mar 12"];
+        const chartPrices = [4491.07];
         let currentChart = null;
         let currentPeriod = '1d';
 
@@ -185,21 +191,31 @@
 
         async function loadChart(period) {
             try {
-                const res = await fetch(`${API}/api/history/${period}`);
-                const data = await res.json();
+                let labels, prices;
                 
-                if (!data.data || !Array.isArray(data.data)) {
-                    document.getElementById('status').textContent = 'No data yet';
-                    return;
+                // Use embedded chart data if available (GitHub Pages), otherwise fetch from API
+                if (typeof chartLabels !== 'undefined' && typeof chartPrices !== 'undefined') {
+                    labels = chartLabels;
+                    prices = chartPrices;
+                } else {
+                    // Fallback to API fetch for localhost development
+                    const res = await fetch(`${API}/api/history/${period}`);
+                    const data = await res.json();
+                    
+                    if (!data.data || !Array.isArray(data.data)) {
+                        document.getElementById('status').textContent = 'No data yet';
+                        return;
+                    }
+                    
+                    labels = data.data.map(d => d.date);
+                    prices = data.data.map(d => d.price_eur);
                 }
-
-                if (data.data.length === 0) {
+                
+                if (prices.length === 0) {
                     document.getElementById('status').textContent = '📊 Accumulating daily data';
                     return;
                 }
 
-                const labels = data.data.map(d => d.date);
-                const prices = data.data.map(d => d.price_eur);
                 const singlePoint = prices.length === 1;
 
                 if (singlePoint) {
