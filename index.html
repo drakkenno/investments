@@ -21,130 +21,57 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            animation: slideDown 0.6s ease-out;
-        }
-
         h1 {
-            font-size: 2.5em;
+            text-align: center;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #ffd700;
+            font-size: 2.5em;
         }
 
         .subtitle {
+            text-align: center;
             color: #b0b0b0;
-            font-size: 1.1em;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
             margin-bottom: 30px;
         }
 
-        .card {
+        .price-card {
+            background: rgba(255, 215, 0, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .price-label {
+            color: #b0b0b0;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .price-value {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .price-time {
+            color: #888;
+            font-size: 0.95em;
+        }
+
+        .chart-card {
             background: rgba(255, 215, 0, 0.05);
             border: 2px solid rgba(255, 215, 0, 0.2);
             border-radius: 15px;
             padding: 25px;
-            backdrop-filter: blur(10px);
-            animation: fadeIn 0.6s ease-out;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 215, 0, 0.5);
-        }
-
-        .price-card {
-            grid-column: 1 / -1;
-        }
-
-        .price-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .price-info {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .price-label {
-            font-size: 0.95em;
-            color: #b0b0b0;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .price-value {
-            font-size: 3em;
-            font-weight: bold;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .price-change {
-            margin-top: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-        }
-
-        .price-change.positive {
-            color: #4ade80;
-        }
-
-        .price-change.negative {
-            color: #f87171;
-        }
-
-        .currency-toggle {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .currency-btn {
-            padding: 10px 20px;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            background: transparent;
-            color: #ffffff;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .currency-btn.active {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #1e1e2e;
-            border-color: #ffd700;
-        }
-
-        .currency-btn:hover {
-            border-color: rgba(255, 215, 0, 0.6);
-        }
-
-        .chart-card {
-            grid-column: 1 / -1;
         }
 
         .chart-header {
@@ -156,32 +83,31 @@
             gap: 15px;
         }
 
-        .time-period {
+        .time-buttons {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
-        .time-btn {
-            padding: 8px 16px;
+        button {
+            padding: 10px 18px;
             border: 2px solid rgba(255, 215, 0, 0.3);
             background: transparent;
             color: #ffffff;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9em;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
-        .time-btn.active {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #1e1e2e;
-            border-color: #ffd700;
+        button:hover {
+            border-color: rgba(255, 215, 0, 0.6);
         }
 
-        .time-btn:hover {
-            border-color: rgba(255, 215, 0, 0.6);
+        button.active {
+            background: #ffd700;
+            color: #1e1e2e;
+            border-color: #ffd700;
         }
 
         .chart-container {
@@ -190,660 +116,173 @@
             margin-bottom: 20px;
         }
 
-        .loading {
+        .status {
             text-align: center;
-            padding: 40px;
-            color: #b0b0b0;
-        }
-
-        .loading::after {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 215, 0, 0.3);
-            border-top-color: #ffd700;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-
-        .error {
-            background: rgba(248, 113, 113, 0.1);
-            border: 2px solid #f87171;
-            color: #fca5a5;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .error a {
-            color: #fca5a5;
-            text-decoration: underline;
-            font-weight: 600;
-        }
-
-        .error a:hover {
-            color: #ffffff;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 15px;
-            background: rgba(255, 215, 0, 0.05);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 8px;
-        }
-
-        .stat-label {
-            font-size: 0.85em;
-            color: #b0b0b0;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .stat-value {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #ffd700;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 215, 0, 0.1);
-            color: #b0b0b0;
+            color: #888;
             font-size: 0.9em;
+            margin-top: 15px;
         }
 
-        @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .price-value {
-                font-size: 2em;
-            }
-
-            .price-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .chart-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+        .status.live {
+            color: #4ade80;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>💰 Gold Price Dashboard</h1>
-            <p class="subtitle">Real-time gold prices and historical trends</p>
-        </header>
+        <h1>💰 Gold Price</h1>
+        <p class="subtitle">Daily EUR prices from bullionbypost.eu</p>
 
-        <div class="dashboard">
-            <!-- Current Price Card -->
-            <div class="card price-card">
-                <div class="price-content">
-                    <div class="price-info">
-                        <div class="price-label">Current Gold Price (per oz)</div>
-                        <div class="price-value" id="currentPrice">$2,050.00</div>
-                        <div class="price-change" id="priceChange">↑ +$15.50 (0.76%)</div>
-                    </div>
-                    <div class="currency-toggle">
-                        <button class="currency-btn active" data-currency="USD" onclick="switchCurrency('USD')">USD</button>
-                        <button class="currency-btn" data-currency="EUR" onclick="switchCurrency('EUR')">EUR</button>
-                        <button class="currency-btn" data-currency="GBP" onclick="switchCurrency('GBP')">GBP</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chart Card -->
-            <div class="card chart-card">
-                <div class="chart-header">
-                    <h2>Price History</h2>
-                    <div class="time-period">
-                        <button class="time-btn active" data-period="1d" onclick="loadChart('1d')">1 Day</button>
-                        <button class="time-btn" data-period="1w" onclick="loadChart('1w')">1 Week</button>
-                        <button class="time-btn" data-period="1m" onclick="loadChart('1m')">1 Month</button>
-                        <button class="time-btn" data-period="1y" onclick="loadChart('1y')">1 Year</button>
-                        <button class="time-btn" data-period="all" onclick="loadChart('all')">Lifetime</button>
-                    </div>
-                </div>
-                <div id="errorContainer"></div>
-                <div class="chart-container">
-                    <canvas id="priceChart"></canvas>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-label">High</div>
-                        <div class="stat-value" id="highPrice">$2,080.00</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Low</div>
-                        <div class="stat-value" id="lowPrice">$2,020.00</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Average</div>
-                        <div class="stat-value" id="avgPrice">$2,050.00</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Change</div>
-                        <div class="stat-value" id="changePercent">+0.76%</div>
-                    </div>
-                </div>
-            </div>
+        <div class="price-card">
+            <div class="price-label">Current Price</div>
+            <div class="price-value" id="price">€0.00</div>
+            <div class="price-time" id="time">Loading...</div>
         </div>
 
-        <footer>
-            <p>Last updated: <span id="lastUpdate">Loading...</span></p>
-            <p>Data source: <span id="dataSource">Initializing...</span> | © 2026 Gold Dashboard</p>
-            <p style="font-size: 0.8em; margin-top: 10px; color: #808080;">
-                💡 Tip: Gold prices are fetched in real-time when available. Open browser console (F12) to check API status.
-            </p>
-        </footer>
+        <div class="chart-card">
+            <div class="chart-header">
+                <div>Price History</div>
+                <div class="time-buttons" id="buttons-container">
+                    <button data-period="1d" onclick="changePeriod('1d')" class="active">1D</button>
+                    <button data-period="1w" onclick="changePeriod('1w')">1W</button>
+                    <button data-period="1m" onclick="changePeriod('1m')">1M</button>
+                    <button data-period="1y" onclick="changePeriod('1y')">1Y</button>
+                    <button data-period="all" onclick="changePeriod('all')">All</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+            <div class="status" id="status">Connecting...</div>
+        </div>
     </div>
 
     <script>
-        let chart = null;
-        let currentCurrency = 'USD';
-        let priceHistory = [];
-        let isRealData = false;  // Track if we have real API data
-        const API_BASE_URL = 'https://api.gold-api.com';
-        const METALPRICEAPI_URL = 'https://api.metalpriceapi.com/v1';
-        const METALPRICEAPI_KEY = '39e6e8602948c2a1d94378f894a0c755';
-        const HISTORY_STORAGE_KEY = 'goldPriceHistory';
-        const METALPRICEAPI_HISTORY_KEY = 'metalpriceHistoryCache';
-        const PRICE_CACHE_KEY = 'goldPriceCacheXAU';
-        const CACHE_TTL_MS = 60 * 1000;
-        const HISTORY_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours for historical data
-        
-        // Real-time price API (gold-api.com) + Historical API (metalpriceapi.com)
-        const currencySymbols = {
-            'USD': '$',
-            'EUR': '€',
-            'GBP': '£'
-        };
+        // Resolve API endpoint safely for localhost, LAN access, and file:// fallback.
+        const host = window.location.hostname || 'localhost';
+        const API = `http://${host}:5000`;
+        let currentChart = null;
+        let currentPeriod = '1d';
 
-        const currencyRates = {
-            'USD': 1.0,
-            'EUR': 0.92,
-            'GBP': 0.79
-        };
-
-        function getCachedPrice() {
-            const cached = localStorage.getItem(PRICE_CACHE_KEY);
-            if (!cached) return null;
-
+        async function fetchPrice() {
             try {
-                const parsed = JSON.parse(cached);
-                if (!parsed || typeof parsed.price !== 'number' || typeof parsed.fetchedAt !== 'number') {
-                    return null;
-                }
-
-                if (Date.now() - parsed.fetchedAt > CACHE_TTL_MS) {
-                    return null;
-                }
-
-                return parsed;
-            } catch (error) {
-                return null;
-            }
-        }
-
-        function setCachedPrice(price, updatedAt, updatedAtReadable) {
-            localStorage.setItem(PRICE_CACHE_KEY, JSON.stringify({
-                price,
-                updatedAt,
-                updatedAtReadable,
-                fetchedAt: Date.now()
-            }));
-        }
-
-        // Load price history from localStorage
-        function loadPriceHistory() {
-            const stored = localStorage.getItem(HISTORY_STORAGE_KEY);
-            if (stored) {
-                try {
-                    priceHistory = JSON.parse(stored).filter(item =>
-                        item && typeof item.price === 'number' && item.fullDate
-                    );
-                } catch (error) {
-                    priceHistory = [];
-                }
-            }
-        }
-
-        // Save price history to localStorage
-        function savePriceHistory() {
-            // Keep only last 2 years of data
-            const twoYearsAgo = new Date();
-            twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-            
-            priceHistory = priceHistory.filter(item => 
-                new Date(item.fullDate) > twoYearsAgo
-            );
-            
-            localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(priceHistory));
-        }
-
-        // Fetch real gold prices from gold-api.com
-        async function fetchRealGoldPrice() {
-            const cached = getCachedPrice();
-            if (cached) {
-                isRealData = true;
-                document.getElementById('dataSource').textContent = '✓ Real-time api.gold-api.com (cached 1 min)';
-                document.getElementById('dataSource').style.color = '#4ade80';
-                addToHistory(cached.price, cached.updatedAt);
-                return cached.price;
-            }
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/price/XAU`);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                const data = await response.json();
+                const res = await fetch(`${API}/api/price`);
+                const data = await res.json();
                 
-                console.log('Gold API Response:', data);
-                
-                if (data && typeof data.price === 'number') {
-                    const pricePerOz = data.price;
-
-                    console.log('✓ Got REAL price from api.gold-api.com:', pricePerOz);
-                    isRealData = true;
-                    document.getElementById('dataSource').textContent = '✓ Real-time api.gold-api.com';
-                    document.getElementById('dataSource').style.color = '#4ade80';
-                    setCachedPrice(pricePerOz, data.updatedAt, data.updatedAtReadable);
-                    addToHistory(pricePerOz, data.updatedAt);
-                    return pricePerOz;
+                if (data && data.prices && data.prices.eur) {
+                    document.getElementById('price').textContent = `€${data.prices.eur.toFixed(2)}`;
+                    const dt = new Date(data.timestamp);
+                    document.getElementById('time').textContent = dt.toLocaleString();
+                    document.getElementById('status').textContent = '✓ Live';
+                    document.getElementById('status').className = 'status live';
                 }
-            } catch (error) {
-                console.warn('✗ api.gold-api.com failed:', error);
-            }
-
-            if (priceHistory.length > 0) {
-                const fallbackPrice = priceHistory[priceHistory.length - 1].price;
-                document.getElementById('dataSource').textContent = '⚠ Offline: showing last saved real price';
-                document.getElementById('dataSource').style.color = '#f59e0b';
-                return fallbackPrice;
-            }
-
-            document.getElementById('dataSource').textContent = '❌ No price data available yet';
-            document.getElementById('dataSource').style.color = '#f87171';
-
-            return null;
-        }
-
-        // Fetch historical gold prices from metalpriceapi.com
-        async function fetchHistoricalPrices(days) {
-            try {
-                // Check cache first (24-hour TTL for historical data)
-                const cacheKey = `${METALPRICEAPI_HISTORY_KEY}_${days}d`;
-                const cached = localStorage.getItem(cacheKey);
-                if (cached) {
-                    const parsed = JSON.parse(cached);
-                    if (Date.now() - parsed.fetchedAt < HISTORY_CACHE_TTL_MS) {
-                        console.log(`✓ Using cached historical data for last ${days} days`);
-                        return parsed.data;
-                    }
-                }
-
-                const endDate = new Date();
-                const startDate = new Date();
-                startDate.setDate(startDate.getDate() - Math.max(days - 1, 1));
-
-                const startDateStr = startDate.toISOString().split('T')[0];
-                const endDateStr = endDate.toISOString().split('T')[0];
-
-                const url = `${METALPRICEAPI_URL}/timeframe?api_key=${METALPRICEAPI_KEY}&base=USD&currencies=XAU&start_date=${startDateStr}&end_date=${endDateStr}`;
-                console.log(`Fetching historical data from ${startDateStr} to ${endDateStr}...`);
-
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-                if (data && data.success && data.rates) {
-                    // Convert metalpriceapi format to our internal format
-                    const history = [];
-                    for (const [dateStr, rateData] of Object.entries(data.rates)) {
-                        if (rateData && typeof rateData.USDXAU === 'number') {
-                            history.push({
-                                date: new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                                fullDate: new Date(dateStr).toISOString(),
-                                price: Math.round(rateData.USDXAU * 100) / 100
-                            });
-                        }
-                    }
-
-                    // Sort by date
-                    history.sort((a, b) => new Date(a.fullDate) - new Date(b.fullDate));
-
-                    if (history.length > 0) {
-                        // Cache the historical data
-                        localStorage.setItem(cacheKey, JSON.stringify({
-                            data: history,
-                            fetchedAt: Date.now()
-                        }));
-                        console.log(`✓ Fetched ${history.length} historical data points from metalpriceapi.com`);
-                        return history;
-                    }
-                }
-            } catch (error) {
-                console.warn('✗ metalpriceapi.com historical fetch failed:', error);
-            }
-            return null;
-        }
-
-        // Helper function to add price to history
-        function addToHistory(pricePerOz, sourceTimestamp = null) {
-            const now = sourceTimestamp ? new Date(sourceTimestamp) : new Date();
-            const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-            
-            // Keep one snapshot per minute max to avoid storage bloat and duplicate rows
-            const lastEntry = priceHistory[priceHistory.length - 1];
-            if (!lastEntry || Math.abs(now - new Date(lastEntry.fullDate)) > 60 * 1000) {
-                priceHistory.push({
-                    date: dateStr,
-                    fullDate: now.toISOString(),
-                    price: Math.round(pricePerOz * 100) / 100
-                });
-                savePriceHistory();
+            } catch (e) {
+                document.getElementById('status').textContent = '⚠ Offline';
+                document.getElementById('status').className = 'status';
+                console.error('Price error:', e);
             }
         }
 
-        // Generate historical data based on stored data or metalpriceapi fetch
-        async function getHistoricalData(period) {
-            let historicalData = null;
-            let dayRange = 1;
-
-            switch(period) {
-                case '1d':
-                    dayRange = 1;
-                    break;
-                case '1w':
-                    dayRange = 7;
-                    break;
-                case '1m':
-                    dayRange = 30;
-                    break;
-                case '1y':
-                    dayRange = 365;
-                    break;
-                case 'all':
-                    dayRange = 730; // 2 years
-                    break;
-            }
-
-            // Try to fetch from metalpriceapi for accurate historical data
-            historicalData = await fetchHistoricalPrices(dayRange);
-
-            if (historicalData && historicalData.length > 0) {
-                return historicalData;
-            }
-
-            // Fallback to stored history
-            const now = new Date();
-            let startDate = new Date(now);
-            
-            switch(period) {
-                case '1d':
-                    startDate.setHours(startDate.getHours() - 24);
-                    break;
-                case '1w':
-                    startDate.setDate(startDate.getDate() - 7);
-                    break;
-                case '1m':
-                    startDate.setDate(startDate.getDate() - 30);
-                    break;
-                case '1y':
-                    startDate.setFullYear(startDate.getFullYear() - 1);
-                    break;
-                case 'all':
-                    startDate.setFullYear(startDate.getFullYear() - 2);
-                    break;
-            }
-
-            const filtered = priceHistory
-                .filter(item => new Date(item.fullDate) >= startDate)
-                .sort((a, b) => new Date(a.fullDate) - new Date(b.fullDate));
-
-            if (filtered.length > 0) {
-                return filtered;
-            }
-
-            const latest = priceHistory[priceHistory.length - 1];
-            if (latest) {
-                return [latest];
-            }
-
-            return [];
-        }
-
-        // Convert price based on selected currency
-        function convertPrice(price, currency) {
-            return price * currencyRates[currency];
-        }
-
-        // Format price with proper symbol
-        function formatPrice(price, currency = currentCurrency) {
-            const symbol = currencySymbols[currency];
-            return symbol + price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-
-        // Update current price display
-        function updateCurrentPrice(data) {
-            if (data.length === 0) return;
-
-            const latest = data[data.length - 1];
-            const previous = data.length > 1 ? data[0] : latest;
-            const change = latest.price - previous.price;
-            const changePercent = previous.price ? (change / previous.price) * 100 : 0;
-
-            const convertedPrice = convertPrice(latest.price, currentCurrency);
-            const convertedChange = convertPrice(change, currentCurrency);
-
-            document.getElementById('currentPrice').textContent = formatPrice(convertedPrice, currentCurrency);
-            
-            const changeElement = document.getElementById('priceChange');
-            changeElement.textContent = `${change >= 0 ? '↑' : '↓'} ${formatPrice(Math.abs(convertedChange), currentCurrency)} (${changePercent.toFixed(2)}%)`;
-            changeElement.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
-
-            // Update stats
-            const prices = data.map(d => d.price);
-            const high = Math.max(...prices);
-            const low = Math.min(...prices);
-            const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
-
-            document.getElementById('highPrice').textContent = formatPrice(convertPrice(high, currentCurrency), currentCurrency);
-            document.getElementById('lowPrice').textContent = formatPrice(convertPrice(low, currentCurrency), currentCurrency);
-            document.getElementById('avgPrice').textContent = formatPrice(convertPrice(avg, currentCurrency), currentCurrency);
-            document.getElementById('changePercent').textContent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%`;
-
-            // Update last updated time
-            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
-        }
-
-        // Load and display chart
         async function loadChart(period) {
-            // Update active button
-            document.querySelectorAll('.time-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-period="${period}"]`).classList.add('active');
+            try {
+                const res = await fetch(`${API}/api/history/${period}`);
+                const data = await res.json();
+                
+                if (!data.data || !Array.isArray(data.data)) {
+                    document.getElementById('status').textContent = 'No data yet';
+                    return;
+                }
 
-            // Get data for the selected period (now async due to API fetch)
-            const data = await getHistoricalData(period);
+                if (data.data.length === 0) {
+                    document.getElementById('status').textContent = '📊 Accumulating daily data';
+                    return;
+                }
 
-            // Update current price
-            updateCurrentPrice(data);
+                const labels = data.data.map(d => d.date);
+                const prices = data.data.map(d => d.price_eur);
+                const singlePoint = prices.length === 1;
 
-            // Prepare chart data
-            const labels = data.map(d => d.date);
-            const prices = data.map(d => convertPrice(d.price, currentCurrency));
+                if (singlePoint) {
+                    document.getElementById('status').textContent = 'Only 1 daily point collected so far';
+                    document.getElementById('status').className = 'status';
+                }
 
-            // Destroy existing chart if it exists
-            if (chart) {
-                chart.destroy();
-            }
+                if (currentChart) {
+                    currentChart.destroy();
+                }
 
-            // Create new chart
-            const ctx = document.getElementById('priceChart').getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(255, 215, 0, 0.3)');
-            gradient.addColorStop(1, 'rgba(255, 215, 0, 0.05)');
-
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Gold Price (per oz)',
-                        data: prices,
-                        borderColor: '#ffd700',
-                        backgroundColor: gradient,
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: period === '1d' ? 4 : 2,
-                        pointBackgroundColor: '#ffd700',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointHoverRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            labels: {
-                                color: '#ffffff',
-                                font: {
-                                    size: 12,
-                                    weight: 'bold'
-                                }
-                            }
-                        }
+                const ctx = document.getElementById('chart').getContext('2d');
+                currentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'EUR Price',
+                            data: prices,
+                            borderColor: '#ffd700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            borderWidth: 2,
+                            fill: !singlePoint,
+                            tension: 0.3,
+                            showLine: !singlePoint,
+                            pointRadius: singlePoint ? 10 : 4,
+                            pointHoverRadius: singlePoint ? 12 : 6,
+                            pointBorderWidth: singlePoint ? 3 : 1,
+                            pointBackgroundColor: '#ffd700',
+                            pointBorderColor: '#1e1e2e'
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: {
-                                color: 'rgba(255, 215, 0, 0.1)'
-                            },
-                            ticks: {
-                                color: '#b0b0b0',
-                                callback: function(value) {
-                                    return currencySymbols[currentCurrency] + value.toFixed(0);
-                                }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#fff' }
                             }
                         },
-                        x: {
-                            grid: {
-                                color: 'rgba(255, 215, 0, 0.05)'
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255,215,0,0.1)' },
+                                ticks: { color: '#b0b0b0' }
                             },
-                            ticks: {
-                                color: '#b0b0b0'
+                            x: {
+                                grid: { color: 'rgba(255,215,0,0.1)' },
+                                ticks: { color: '#b0b0b0' }
                             }
                         }
                     }
+                });
+                if (!singlePoint) {
+                    document.getElementById('status').textContent = '✓ Daily prices loaded';
+                    document.getElementById('status').className = 'status live';
                 }
-            });
-        }
-
-        // Switch currency
-        function switchCurrency(currency) {
-            currentCurrency = currency;
-
-            // Update active button
-            document.querySelectorAll('.currency-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-currency="${currency}"]`).classList.add('active');
-
-            // Reload chart with new currency
-            const activePeriod = document.querySelector('.time-btn.active').getAttribute('data-period');
-            loadChart(activePeriod);
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Load stored price history
-            loadPriceHistory();
-            
-            // Show loading status
-            document.getElementById('dataSource').textContent = '⏳ Loading...';
-            
-            // Fetch real price from API
-            console.log('Fetching current gold price from api.gold-api.com...');
-            const realPrice = await fetchRealGoldPrice();
-            if (realPrice) {
-                console.log('✓ Successfully fetched real price:', realPrice);
-            } else {
-                console.log('Using historical data - real price fetch unavailable');
-                if (!isRealData) {
-                    document.getElementById('dataSource').textContent = '📊 Using cached data';
-                    document.getElementById('dataSource').style.color = '#f59e0b';
-                }
+            } catch (e) {
+                document.getElementById('status').textContent = '⚠ Error loading chart';
+                console.error('Chart error:', e);
             }
-            
-            // Load initial chart with historical data
-            console.log('Fetching historical data from metalpriceapi.com...');
-            await loadChart('1d');
-        });
+        }
 
-        // Auto-refresh price every 5 minutes
-        setInterval(async function() {
-            console.log('Auto-refreshing gold price...');
-            const realPrice = await fetchRealGoldPrice();
-            const activePeriod = document.querySelector('.time-btn.active').getAttribute('data-period');
-            await loadChart(activePeriod);
-        }, 5 * 60 * 1000);
+        function changePeriod(period) {
+            currentPeriod = period;
+            
+            // Update period buttons safely by explicit period key.
+            const buttons = document.querySelectorAll('#buttons-container button');
+            buttons.forEach(btn => {
+                if (!btn || !btn.classList) {
+                    return;
+                }
+                btn.classList.toggle('active', btn.dataset.period === period);
+            });
+
+            loadChart(period);
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            fetchPrice();
+            loadChart('1d');
+            setInterval(fetchPrice, 5 * 60 * 1000);
+        });
     </script>
 </body>
 </html>
