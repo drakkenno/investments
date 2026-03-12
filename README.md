@@ -57,29 +57,64 @@ A responsive, real-time gold price dashboard with historical price tracking and 
    npx http-server
    ```
 
-## Real-Time Data Integration
+## Real-Time & Historical Data Integration
 
-The dashboard is integrated with **api.gold-api.com** for real, live gold prices - **completely free, no API key required!**
+The dashboard combines **two premium APIs** for comprehensive gold price data:
+
+### Current Price: api.gold-api.com ✓ Free
+- Real-time spot prices (gold offered in USD per troy ounce)
+- 1-minute cache to prevent IP blocking
+- No API key required
+
+### Historical Prices: metalpriceapi.com 📊 Professional
+- 30+ days to 2+ years of historical data
+- Daily/hourly granularity available
+- REST API: `https://api.metalpriceapi.com/v1/timeframe`
+- API Key: `39e6e8602948c2a1d94378f894a0c755`
+- 24-hour local cache to minimize API calls
 
 ### How It Works
 
-1. **Current Price**: Fetched in real-time from `https://api.gold-api.com/price/XAU`
-2. **Price History**: Built from real snapshots saved in your browser's localStorage, accumulating over time
-3. **Fallback**: If the API is unavailable, the dashboard uses the last saved real price from local history
+1. **Current Price**: Fetched in real-time from gold-api.com when you load the page
+2. **Price History**: Automatically fetched from metalpriceapi.com for your selected time period
+3. **Local Caching**: 
+   - Current price: cached 1 minute
+   - Historical data: cached 24 hours
+   - Fallback: uses browser localStorage if APIs are unavailable
+4. **Auto-Refresh**: Prices update every 5 minutes
 4. **Auto-Refresh**: Prices update every 5 minutes automatically
 
-### gold-api.com API
+### gold-api.com (Real-Time)
 
 - **Website**: [api.gold-api.com](https://api.gold-api.com)
 - **Cost**: Completely Free
-- **No API Key**: Required! Just works out of the box
-- **Rate Limits**: Generous free tier - perfect for client-side use
-- **What You Get**: Real-time gold prices in USD and other assets via symbols
+- **No API Key**: Required!
+- **Endpoint**: `GET https://api.gold-api.com/price/XAU`
+- **Rate Limits**: Generous free tier - perfect for client-side use (recommended 1-min cache)
+
+### metalpriceapi.com (Historical)
+
+- **Website**: [metalpriceapi.com](https://metalpriceapi.com)
+- **Cost**: Paid plan (you have API key)
+- **API Key**: Included in dashboard code
+- **Endpoint**: `GET https://api.metalpriceapi.com/v1/timeframe`
+- **What You Get**: Real-time + 30+ days to 2 years of historical precious metals prices
+- **Response Format**: 
+  ```json
+  {
+    "rates": {
+      "2026-03-12": { "USDXAU": 5182.20 },
+      "2026-03-13": { "USDXAU": 5190.45 }
+    }
+  }
+  ```
+  (USDXAU = USD price per troy ounce of gold)
 
 ### Local Storage
 
-The dashboard stores price history in your browser's localStorage:
-- Automatically saves new price data as it's fetched
+The dashboard stores data in your browser's localStorage:
+- **Current price**: Cached for 1 minute (respects API fair-use policy)
+- **Historical data**: Cached for 24 hours (reduces API quota usage)
 - Keeps up to 2 years of historical data
 - Survives page refreshes and browser sessions
 - No server required - works entirely client-side
@@ -100,31 +135,23 @@ Update the gradient colors in the CSS:
 - Gold accent: `#ffd700` (change throughout CSS)
 - Background: `linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%)`
 
-### Modify Currency Conversion Rates
+### Modify API Configuration
 
-Modify the `currencyRates` object in the script section:
+The APIs are configured in the HTML file's script section:
+
 ```javascript
-const currencyRates = {
-    'USD': 1.0,
-    'EUR': 0.92,    // Change these rates to match current values
-    'GBP': 0.79
-};
+const API_BASE_URL = 'https://api.gold-api.com';                               // Current price API
+const METALPRICEAPI_URL = 'https://api.metalpriceapi.com/v1';                  // Historical API
+const METALPRICEAPI_KEY = '39e6e8602948c2a1d94378f894a0c755';                 // Your API key
+const CACHE_TTL_MS = 60 * 1000;                                                // 1 minute - current price cache
+const HISTORY_CACHE_TTL_MS = 24 * 60 * 60 * 1000;                              // 24 hours - historical cache
 ```
 
-### Adjust Data Storage Limit
-
-In the `savePriceHistory()` function, change how much history to keep:
-```javascript
-// Keep only last 2 years of data (modify this)
-const twoYearsAgo = new Date();
-twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-```
-
-### Change Auto-Refresh Interval
-Near the bottom of the script:
-```javascript
-}, 5 * 60 * 1000); // 5 minutes - change to desired value
-```
+**To use your own metalpriceapi.com key**:
+1. Sign up at [metalpriceapi.com](https://metalpriceapi.com/register)
+2. Get your API key from the dashboard
+3. Replace the `METALPRICEAPI_KEY` value in `index.html`
+4. Adjust `HISTORY_CACHE_TTL_MS` based on your API quota (lower = more API calls)
 
 ## Browser Support
 
@@ -161,4 +188,4 @@ For issues or suggestions, please create a GitHub issue in the repository.
 
 ---
 
-**✨ No Setup Required!** This dashboard works immediately out of the box. Real gold prices are fetched from [api.gold-api.com](https://api.gold-api.com) - completely free, no API key needed. Just push to GitHub Pages and you're live!
+**✨ Premium Setup!** This dashboard combines two APIs: free real-time prices from [api.gold-api.com](https://api.gold-api.com) + professional historical data from [metalpriceapi.com](https://metalpriceapi.com). Just push to GitHub Pages and you're live with real, accurate gold prices!

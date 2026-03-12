@@ -391,11 +391,15 @@
         let priceHistory = [];
         let isRealData = false;  // Track if we have real API data
         const API_BASE_URL = 'https://api.gold-api.com';
+        const METALPRICEAPI_URL = 'https://api.metalpriceapi.com/v1';
+        const METALPRICEAPI_KEY = '39e6e8602948c2a1d94378f894a0c755';
         const HISTORY_STORAGE_KEY = 'goldPriceHistory';
+        const METALPRICEAPI_HISTORY_KEY = 'metalpriceHistoryCache';
         const PRICE_CACHE_KEY = 'goldPriceCacheXAU';
         const CACHE_TTL_MS = 60 * 1000;
+        const HISTORY_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours for historical data
         
-        // Free price API - no key required for symbols and XAU spot price
+        // Real-time price API (gold-api.com) + Historical API (metalpriceapi.com)
         const currencySymbols = {
             'USD': '$',
             'EUR': '€',
@@ -512,6 +516,68 @@
             return null;
         }
 
+        // Fetch historical gold prices from metalpriceapi.com
+        async function fetchHistoricalPrices(days) {
+            try {
+                // Check cache first (24-hour TTL for historical data)
+                const cacheKey = `${METALPRICEAPI_HISTORY_KEY}_${days}d`;
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (Date.now() - parsed.fetchedAt < HISTORY_CACHE_TTL_MS) {
+                        console.log(`✓ Using cached historical data for last ${days} days`);
+                        return parsed.data;
+                    }
+                }
+
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - Math.max(days - 1, 1));
+
+                const startDateStr = startDate.toISOString().split('T')[0];
+                const endDateStr = endDate.toISOString().split('T')[0];
+
+                const url = `${METALPRICEAPI_URL}/timeframe?api_key=${METALPRICEAPI_KEY}&base=USD&currencies=XAU&start_date=${startDateStr}&end_date=${endDateStr}`;
+                console.log(`Fetching historical data from ${startDateStr} to ${endDateStr}...`);
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data && data.success && data.rates) {
+                    // Convert metalpriceapi format to our internal format
+                    const history = [];
+                    for (const [dateStr, rateData] of Object.entries(data.rates)) {
+                        if (rateData && typeof rateData.USDXAU === 'number') {
+                            history.push({
+                                date: new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                                fullDate: new Date(dateStr).toISOString(),
+                                price: Math.round(rateData.USDXAU * 100) / 100
+                            });
+                        }
+                    }
+
+                    // Sort by date
+                    history.sort((a, b) => new Date(a.fullDate) - new Date(b.fullDate));
+
+                    if (history.length > 0) {
+                        // Cache the historical data
+                        localStorage.setItem(cacheKey, JSON.stringify({
+                            data: history,
+                            fetchedAt: Date.now()
+                        }));
+                        console.log(`✓ Fetched ${history.length} historical data points from metalpriceapi.com`);
+                        return history;
+                    }
+                }
+            } catch (error) {
+                console.warn('✗ metalpriceapi.com historical fetch failed:', error);
+            }
+            return null;
+        }
+
         // Helper function to add price to history
         function addToHistory(pricePerOz, sourceTimestamp = null) {
             const now = sourceTimestamp ? new Date(sourceTimestamp) : new Date();
@@ -529,8 +595,37 @@
             }
         }
 
-        // Generate historical data based on stored data or mock
-        function getHistoricalData(period) {
+        // Generate historical data based on stored data or metalpriceapi fetch
+        async function getHistoricalData(period) {
+            let historicalData = null;
+            let dayRange = 1;
+
+            switch(period) {
+                case '1d':
+                    dayRange = 1;
+                    break;
+                case '1w':
+                    dayRange = 7;
+                    break;
+                case '1m':
+                    dayRange = 30;
+                    break;
+                case '1y':
+                    dayRange = 365;
+                    break;
+                case 'all':
+                    dayRange = 730; // 2 years
+                    break;
+            }
+
+            // Try to fetch from metalpriceapi for accurate historical data
+            historicalData = await fetchHistoricalPrices(dayRange);
+
+            if (historicalData && historicalData.length > 0) {
+                return historicalData;
+            }
+
+            // Fallback to stored history
             const now = new Date();
             let startDate = new Date(now);
             
@@ -613,15 +708,15 @@
         }
 
         // Load and display chart
-        function loadChart(period) {
+        async function loadChart(period) {
             // Update active button
             document.querySelectorAll('.time-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             document.querySelector(`[data-period="${period}"]`).classList.add('active');
 
-            // Get data for the selected period
-            const data = getHistoricalData(period);
+            // Get data for the selected period (now async due to API fetch)
+            const data = await getHistoricalData(period);
 
             // Update current price
             updateCurrentPrice(data);
@@ -725,19 +820,21 @@
             document.getElementById('dataSource').textContent = '⏳ Loading...';
             
             // Fetch real price from API
-            console.log('Fetching current gold price...');
+            console.log('Fetching current gold price from api.gold-api.com...');
             const realPrice = await fetchRealGoldPrice();
             if (realPrice) {
                 console.log('✓ Successfully fetched real price:', realPrice);
             } else {
                 console.log('Using historical data - real price fetch unavailable');
                 if (!isRealData) {
-                    document.getElementById('dataSource').textContent = '📊 Demo data';
+                    document.getElementById('dataSource').textContent = '📊 Using cached data';
                     document.getElementById('dataSource').style.color = '#f59e0b';
                 }
             }
             
-            loadChart('1d');
+            // Load initial chart with historical data
+            console.log('Fetching historical data from metalpriceapi.com...');
+            await loadChart('1d');
         });
 
         // Auto-refresh price every 5 minutes
@@ -745,7 +842,7 @@
             console.log('Auto-refreshing gold price...');
             const realPrice = await fetchRealGoldPrice();
             const activePeriod = document.querySelector('.time-btn.active').getAttribute('data-period');
-            loadChart(activePeriod);
+            await loadChart(activePeriod);
         }, 5 * 60 * 1000);
     </script>
 </body>
